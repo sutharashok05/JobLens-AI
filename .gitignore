@@ -1,0 +1,153 @@
+# ==========================================
+# JOBLENS AI - ROOT GITIGNORE
+# ==========================================
+
+# --------------------------
+# Environment / Secrets
+# --------------------------
+.env
+.env.*
+!.env.example
+
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+
+# --------------------------
+# Python
+# --------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+backend/venv/
+backend/.venv/
+
+
+# --------------------------
+# Python logs
+# --------------------------
+*.log
+logs/
+backend/logs/
+
+
+# --------------------------
+# Uploaded user files
+# --------------------------
+
+# IMPORTANT:
+# Uploaded resumes should NEVER go to GitHub.
+
+backend/uploads/
+uploads/
+
+# PDF/DOC files uploaded by users
+*.pdf
+*.doc
+*.docx
+
+
+# --------------------------
+# Node / React
+# --------------------------
+node_modules/
+frontend/node_modules/
+
+# Build files
+dist/
+build/
+
+frontend/dist/
+frontend/build/
+
+# Vite cache
+.vite/
+
+
+# --------------------------
+# NPM / Yarn / PNPM logs
+# --------------------------
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# --------------------------
+# IDE
+# --------------------------
+.vscode/
+.idea/
+
+*.code-workspace
+
+
+# --------------------------
+# OS files
+# --------------------------
+.DS_Store
+Thumbs.db
+
+
+# --------------------------
+# Temporary files
+# --------------------------
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+tmp/
+temp/
+
+
+# --------------------------
+# Local databases
+# --------------------------
+*.sqlite
+*.sqlite3
+*.db
+
+postgres-data/
+pgdata/
+
+
+# --------------------------
+# Cache
+# --------------------------
+.cache/
+cache/
+backend/cache/
+
+
+# --------------------------
+# Coverage / Test output
+# --------------------------
+.coverage
+.coverage.*
+htmlcov/
+coverage/
+test-results/
+
+
+# --------------------------
+# Jupyter
+# --------------------------
+.ipynb_checkpoints/

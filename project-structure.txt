@@ -1,0 +1,121 @@
+/
+├── backend
+│   ├── alembic
+│   │   ├── versions
+│   │   │   ├── 32bcdb0fe5de_add_complete_candidate_profile_fields.py
+│   │   │   ├── 49de57290a8d_add_profile_intelligence_fields.py
+│   │   │   ├── 4d09526bb9aa_create_users_and_resumes.py
+│   │   │   └── 7885ae6e2435_add_candidate_profiles.py
+│   │   ├── env.py
+│   │   ├── README
+│   │   └── script.py.mako
+│   ├── app
+│   │   ├── api
+│   │   │   ├── __init__.py
+│   │   │   ├── profile.py
+│   │   │   ├── resumes.py
+│   │   │   └── search.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   └── config.py
+│   │   ├── db
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py
+│   │   │   ├── database.py
+│   │   │   └── models.py
+│   │   ├── models
+│   │   │   ├── __init__.py
+│   │   │   ├── candidate_profile.py
+│   │   │   ├── resume.py
+│   │   │   └── user.py
+│   │   ├── providers
+│   │   │   ├── adzuna
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── provider.py
+│   │   │   ├── ats
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── company_registry.py
+│   │   │   │   └── provider.py
+│   │   │   ├── company_careers
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── provider.py
+│   │   │   ├── duckduckgo
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── provider.py
+│   │   │   ├── google
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── provider.py
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py
+│   │   │   └── registry.py
+│   │   ├── schemas
+│   │   │   ├── __init__.py
+│   │   │   ├── job.py
+│   │   │   ├── personalized_query.py
+│   │   │   ├── search.py
+│   │   │   ├── search_intent.py
+│   │   │   └── search_plan.py
+│   │   ├── services
+│   │   │   ├── __init__.py
+│   │   │   ├── candidate_parser.py
+│   │   │   ├── job_deduplicator.py
+│   │   │   ├── job_matcher.py
+│   │   │   ├── job_normalizer.py
+│   │   │   ├── job_ranker.py
+│   │   │   ├── job_search.py
+│   │   │   ├── job_verifier.py
+│   │   │   ├── personalized_query.py
+│   │   │   ├── profile_service.py
+│   │   │   ├── resume_parser.py
+│   │   │   ├── search_intent.py
+│   │   │   └── search_planner.py
+│   │   ├── __init__.py
+│   │   └── main.py
+│   ├── uploads
+│   │   └── resumes
+│   │       └── 689db59bcc3f4210afc30714bf065d4e.pdf
+│   ├── .env.example
+│   ├── .gitignore
+│   ├── alembic.ini
+│   ├── backend_structure.txt
+│   ├── requirements.txt
+│   ├── test_matcher.py
+│   ├── test_parser.py
+│   ├── test_ranker.py
+│   └── test_serpapi.py
+├── frontend
+│   ├── public
+│   │   ├── favicon.svg
+│   │   └── icons.svg
+│   ├── src
+│   │   ├── assets
+│   │   │   ├── hero.png
+│   │   │   ├── react.svg
+│   │   │   └── vite.svg
+│   │   ├── components
+│   │   │   ├── Layout.jsx
+│   │   │   └── Navbar.jsx
+│   │   ├── context
+│   │   ├── pages
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── JobDetails.jsx
+│   │   │   ├── Jobs.jsx
+│   │   │   ├── Profile.jsx
+│   │   │   └── Resume.jsx
+│   │   ├── services
+│   │   │   └── api.js
+│   │   ├── store
+│   │   │   ├── jobsSlice.js
+│   │   │   └── store.js
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   └── main.jsx
+│   ├── .gitignore
+│   ├── .oxlintrc.json
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── README.md
+│   └── vite.config.js
+├── .gitignore
+└── print_structure.py
