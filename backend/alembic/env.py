@@ -18,10 +18,26 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 
-alembic_url = settings.DATABASE_URL.replace(
-    "postgresql+asyncpg://",
-    "postgresql+psycopg://"
-)
+alembic_url = settings.DATABASE_URL
+
+if alembic_url.startswith("postgres://"):
+    alembic_url = alembic_url.replace(
+        "postgres://",
+        "postgresql+psycopg://",
+        1,
+    )
+elif alembic_url.startswith("postgresql://"):
+    alembic_url = alembic_url.replace(
+        "postgresql://",
+        "postgresql+psycopg://",
+        1,
+    )
+elif alembic_url.startswith("postgresql+asyncpg://"):
+    alembic_url = alembic_url.replace(
+        "postgresql+asyncpg://",
+        "postgresql+psycopg://",
+        1,
+    )
 
 config.set_main_option(
     "sqlalchemy.url",
