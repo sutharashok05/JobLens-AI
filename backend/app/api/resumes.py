@@ -28,16 +28,24 @@ async def upload_resume(
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
 ):
+    # ============================================================
     # 1. Validate PDF
+    # ============================================================
+
     if file.content_type != "application/pdf":
         raise HTTPException(
             status_code=400,
             detail="Only PDF resumes are supported.",
         )
 
+    # ============================================================
     # 2. Find or create user
+    # ============================================================
+
     result = await db.execute(
-        select(User).where(User.email == "demo@joblens.ai")
+        select(User).where(
+            User.email == "demo@joblens.ai"
+        )
     )
 
     user = result.scalar_one_or_none()
@@ -51,18 +59,50 @@ async def upload_resume(
         db.add(user)
         await db.flush()
 
+    # ============================================================
     # 3. Generate unique filename
+    # ============================================================
+
     file_id = uuid4().hex
+
     safe_filename = f"{file_id}.pdf"
+
     file_path = UPLOAD_DIR / safe_filename
 
-    # 4. Save PDF
-    file_content = await file.read()
-    file_path.write_bytes(file_content)
+    # ============================================================
+    # 4. Save uploaded PDF
+    # ============================================================
 
-    # 5. Extract text
     try:
-        extracted_text = extract_text_from_pdf(str(file_path))
+        file_content = await file.read()
+
+        if not file_content:
+            raise HTTPException(
+                status_code=400,
+                detail="Uploaded file is empty.",
+            )
+
+        file_path.write_bytes(file_content)
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        file_path.unlink(missing_ok=True)
+
+        raise HTTPException(
+            status_code=500,
+            detail=f"Could not save uploaded file: {str(e)}",
+        )
+
+    # ============================================================
+    # 5. Extract text from PDF
+    # ============================================================
+
+    try:
+        extracted_text = extract_text_from_pdf(
+            str(file_path)
+        )
 
     except Exception as e:
         file_path.unlink(missing_ok=True)
@@ -80,7 +120,13 @@ async def upload_resume(
             detail="Could not extract text from the PDF.",
         )
 
-    # 6. Profile Intelligence
+    # ============================================================
+    # 6. Extract candidate intelligence
+    #
+    # Only job-relevant information should be returned by
+    # candidate_parser.py.
+    # ============================================================
+
     try:
         profile_data = extract_candidate_profile(
             extracted_text
@@ -94,27 +140,46 @@ async def upload_resume(
             detail=f"Could not analyze resume: {str(e)}",
         )
 
+    # ============================================================
     # 7. Deactivate previous resumes
+    # ============================================================
+
     await db.execute(
         update(Resume)
-        .where(Resume.user_id == user.id)
-        .values(is_active=False)
+        .where(
+            Resume.user_id == user.id
+        )
+        .values(
+            is_active=False
+        )
     )
 
+    # ============================================================
     # 8. Determine next resume version
+    # ============================================================
+
     result = await db.execute(
         select(Resume.version)
-        .where(Resume.user_id == user.id)
-        .order_by(Resume.version.desc())
+        .where(
+            Resume.user_id == user.id
+        )
+        .order_by(
+            Resume.version.desc()
+        )
     )
 
     latest_version = result.scalars().first()
 
     next_version = (
-        1 if latest_version is None else latest_version + 1
+        1
+        if latest_version is None
+        else latest_version + 1
     )
 
-    # 9. Create new resume
+    # ============================================================
+    # 9. Create new Resume record
+    # ============================================================
+
     resume = Resume(
         user_id=user.id,
         file_name=file.filename or "resume.pdf",
@@ -125,85 +190,208 @@ async def upload_resume(
     )
 
     db.add(resume)
+
     await db.flush()
 
-    # 10. Find existing candidate profile
+    # ============================================================
+    # 10. Find existing CandidateProfile
+    # ============================================================
+
     result = await db.execute(
-        select(CandidateProfile).where(
+        select(CandidateProfile)
+        .where(
             CandidateProfile.user_id == user.id
         )
     )
 
     profile = result.scalar_one_or_none()
 
-    # 11. Create or update Profile Intelligence
+    # ============================================================
+    # 11. Create or update CandidateProfile
+    #
+    # ONLY necessary job-search intelligence is stored.
+    # ============================================================
+
     if profile is None:
 
         profile = CandidateProfile(
             user_id=user.id,
             resume_id=resume.id,
 
+            # ----------------------------------------------------
             # Skills
-            skills=profile_data["skills"],
-            core_skills=profile_data["core_skills"],
-            supporting_skills=profile_data["supporting_skills"],
+            # ----------------------------------------------------
 
-            # Candidate information
-            education=profile_data["education"],
-            experience=profile_data["experience"],
-            experience_level=profile_data["experience_level"],
+            skills=profile_data.get(
+                "skills",
+                [],
+            ),
 
-            # Resume information
-            projects=profile_data["projects"],
-            certifications=profile_data["certifications"],
+            core_skills=profile_data.get(
+                "core_skills",
+                [],
+            ),
 
-            # Job-search intelligence
-            preferred_roles=profile_data["preferred_roles"],
-            preferred_locations=profile_data["preferred_locations"],
-            preferred_work_modes=profile_data["preferred_work_modes"],
-            career_keywords=profile_data["career_keywords"],
+            supporting_skills=profile_data.get(
+                "supporting_skills",
+                [],
+            ),
 
-            summary=profile_data["summary"],
+            # ----------------------------------------------------
+            # Experience
+            # ----------------------------------------------------
+
+            experience_level=profile_data.get(
+                "experience_level",
+                "Fresher",
+            ),
+
+            # ----------------------------------------------------
+            # Projects
+            # ----------------------------------------------------
+
+            projects=profile_data.get(
+                "projects",
+                [],
+            ),
+
+            # ----------------------------------------------------
+            # Certifications
+            # ----------------------------------------------------
+
+            certifications=profile_data.get(
+                "certifications",
+                [],
+            ),
+
+            # ----------------------------------------------------
+            # Preferred job roles
+            # ----------------------------------------------------
+
+            preferred_roles=profile_data.get(
+                "preferred_roles",
+                [],
+            ),
+
+            # ----------------------------------------------------
+            # Search keywords
+            # ----------------------------------------------------
+
+            career_keywords=profile_data.get(
+                "career_keywords",
+                [],
+            ),
         )
 
         db.add(profile)
 
     else:
 
-        # Update profile for new resume
+        # --------------------------------------------------------
+        # Update profile with latest resume intelligence
+        # --------------------------------------------------------
+
         profile.resume_id = resume.id
 
+        # --------------------------------------------------------
         # Skills
-        profile.skills = profile_data["skills"]
-        profile.core_skills = profile_data["core_skills"]
-        profile.supporting_skills = profile_data["supporting_skills"]
+        # --------------------------------------------------------
 
-        # Candidate information
-        profile.education = profile_data["education"]
-        profile.experience = profile_data["experience"]
-        profile.experience_level = profile_data["experience_level"]
+        profile.skills = profile_data.get(
+            "skills",
+            [],
+        )
 
-        # Resume information
-        profile.projects = profile_data["projects"]
-        profile.certifications = profile_data["certifications"]
+        profile.core_skills = profile_data.get(
+            "core_skills",
+            [],
+        )
 
-        # Job-search intelligence
-        profile.preferred_roles = profile_data["preferred_roles"]
-        profile.preferred_locations = profile_data["preferred_locations"]
-        profile.preferred_work_modes = profile_data["preferred_work_modes"]
-        profile.career_keywords = profile_data["career_keywords"]
+        profile.supporting_skills = profile_data.get(
+            "supporting_skills",
+            [],
+        )
 
-        profile.summary = profile_data["summary"]
+        # --------------------------------------------------------
+        # Experience level
+        # --------------------------------------------------------
 
-    # 12. Save everything
-    await db.commit()
+        profile.experience_level = profile_data.get(
+            "experience_level",
+            "Fresher",
+        )
+
+        # --------------------------------------------------------
+        # Projects
+        # --------------------------------------------------------
+
+        profile.projects = profile_data.get(
+            "projects",
+            [],
+        )
+
+        # --------------------------------------------------------
+        # Certifications
+        # --------------------------------------------------------
+
+        profile.certifications = profile_data.get(
+            "certifications",
+            [],
+        )
+
+        # --------------------------------------------------------
+        # Preferred roles
+        # --------------------------------------------------------
+
+        profile.preferred_roles = profile_data.get(
+            "preferred_roles",
+            [],
+        )
+
+        # --------------------------------------------------------
+        # Career keywords
+        # --------------------------------------------------------
+
+        profile.career_keywords = profile_data.get(
+            "career_keywords",
+            [],
+        )
+
+    # ============================================================
+    # 12. Save database changes
+    # ============================================================
+
+    try:
+
+        await db.commit()
+
+    except Exception as e:
+
+        await db.rollback()
+
+        file_path.unlink(missing_ok=True)
+
+        raise HTTPException(
+            status_code=500,
+            detail=f"Could not save resume/profile: {str(e)}",
+        )
+
+    # ============================================================
+    # 13. Refresh database objects
+    # ============================================================
 
     await db.refresh(resume)
     await db.refresh(profile)
 
-    # 13. Return Profile Intelligence
+    # ============================================================
+    # 14. Return clean response
+    # ============================================================
+
     return {
-        "message": "Resume uploaded and profile intelligence created successfully",
+        "message": (
+            "Resume uploaded and profile intelligence "
+            "created successfully"
+        ),
 
         "resume": {
             "resume_id": resume.id,
@@ -216,23 +404,22 @@ async def upload_resume(
         "profile": {
             "profile_id": profile.id,
 
+            # Skills
             "skills": profile.skills,
             "core_skills": profile.core_skills,
             "supporting_skills": profile.supporting_skills,
 
+            # Experience
             "experience_level": profile.experience_level,
 
-            "preferred_roles": profile.preferred_roles,
-            "preferred_locations": profile.preferred_locations,
-            "preferred_work_modes": profile.preferred_work_modes,
-
-            "career_keywords": profile.career_keywords,
-
-            "education": profile.education,
-            "experience": profile.experience,
+            # Projects
             "projects": profile.projects,
+
+            # Certifications
             "certifications": profile.certifications,
 
-            "summary": profile.summary,
+            # Job-search intelligence
+            "preferred_roles": profile.preferred_roles,
+            "career_keywords": profile.career_keywords,
         },
     }

@@ -292,16 +292,13 @@ def extract_candidate_profile(text: str) -> dict:
         "skills": skills,
         "core_skills": core_skills,
         "supporting_skills": supporting_skills,
-        "education": [],
-        "experience": [],
+
         "experience_level": experience_level,
+
         "projects": [],
         "certifications": [],
+
         "preferred_roles": preferred_roles,
-        "preferred_locations": preferred_locations,
-        "preferred_work_modes": [],
+
         "career_keywords": career_keywords,
-        "summary": text[:1000],
-        "email": extract_email(text),
-        "phone": extract_phone(text),
     }

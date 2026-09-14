@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, JSON, Text
+from sqlalchemy import DateTime, ForeignKey, JSON, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -9,106 +9,102 @@ from app.db.base import Base
 class CandidateProfile(Base):
     __tablename__ = "candidate_profiles"
 
+    # ============================================================
+    # Primary Key
+    # ============================================================
+
     id: Mapped[int] = mapped_column(
         primary_key=True,
-        autoincrement=True
+        autoincrement=True,
     )
+
+    # ============================================================
+    # Relationships
+    # ============================================================
 
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"),
         nullable=False,
         unique=True,
-        index=True
+        index=True,
     )
 
     resume_id: Mapped[int] = mapped_column(
         ForeignKey("resumes.id"),
         nullable=False,
-        index=True
+        index=True,
     )
 
+    # ============================================================
     # Skills
+    # ============================================================
+
     skills: Mapped[list] = mapped_column(
         JSON,
         default=list,
-        nullable=False
+        nullable=False,
     )
 
     core_skills: Mapped[list] = mapped_column(
         JSON,
         default=list,
-        nullable=False
+        nullable=False,
     )
 
     supporting_skills: Mapped[list] = mapped_column(
         JSON,
         default=list,
-        nullable=False
+        nullable=False,
     )
 
-    # Candidate information
-    education: Mapped[list] = mapped_column(
-        JSON,
-        default=list,
-        nullable=False
-    )
-
-    experience: Mapped[list] = mapped_column(
-        JSON,
-        default=list,
-        nullable=False
-    )
+    # ============================================================
+    # Experience Intelligence
+    # ============================================================
 
     experience_level: Mapped[str | None] = mapped_column(
         Text,
-        nullable=True
+        nullable=True,
     )
+
+    # ============================================================
+    # Resume Intelligence
+    # ============================================================
 
     projects: Mapped[list] = mapped_column(
         JSON,
         default=list,
-        nullable=False
+        nullable=False,
     )
 
     certifications: Mapped[list] = mapped_column(
         JSON,
         default=list,
-        nullable=False
+        nullable=False,
     )
 
-    # Job-search intelligence
+    # ============================================================
+    # Job Search Intelligence
+    # ============================================================
+
     preferred_roles: Mapped[list] = mapped_column(
         JSON,
         default=list,
-        nullable=False
-    )
-
-    preferred_locations: Mapped[list] = mapped_column(
-        JSON,
-        default=list,
-        nullable=False
-    )
-
-    preferred_work_modes: Mapped[list] = mapped_column(
-        JSON,
-        default=list,
-        nullable=False
+        nullable=False,
     )
 
     career_keywords: Mapped[list] = mapped_column(
         JSON,
         default=list,
-        nullable=False
+        nullable=False,
     )
 
-    summary: Mapped[str | None] = mapped_column(
-        Text,
-        nullable=True
-    )
+    # ============================================================
+    # Timestamp
+    # ============================================================
 
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow,
         onupdate=datetime.utcnow,
-        nullable=False
+        nullable=False,
     )
