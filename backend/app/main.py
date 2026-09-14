@@ -28,6 +28,16 @@ app.include_router(resume_router)
 app.include_router(profile_router)
 app.include_router(search_router)
 
+@app.get("/")
+async def root():
+    return {
+        "status": "ok",
+        "message": "JobLens AI backend is running",
+        "docs": "/docs",
+        "health": "/health",
+    }
+
+
 
 @app.get("/health")
 async def health_check():
