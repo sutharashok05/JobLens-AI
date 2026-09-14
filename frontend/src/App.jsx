@@ -1,20 +1,18 @@
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Layout from "./components/Layout";
 
 import Dashboard from "./pages/Dashboard";
-import Resume from "./pages/Resume";
 import Jobs from "./pages/Jobs";
-import Layout from "./components/Layout";
-import Profile from "./pages/Profile";
 import JobDetails from "./pages/JobDetails";
+import Profile from "./pages/Profile";
+import Resume from "./pages/Resume";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+
         <Route element={<Layout />}>
 
           <Route
@@ -23,13 +21,8 @@ function App() {
           />
 
           <Route
-            path="/resume"
-            element={<Resume />}
-          />
-
-          <Route
-            path="/profile"
-            element={<Profile />}
+            path="/dashboard"
+            element={<Dashboard />}
           />
 
           <Route
@@ -38,13 +31,22 @@ function App() {
           />
 
           <Route
-            path="/jobs/:jobId"
+            path="/jobs/:id"
             element={<JobDetails />}
           />
 
-          
+          <Route
+            path="/profile"
+            element={<Profile />}
+          />
+
+          <Route
+            path="/resume"
+            element={<Resume />}
+          />
 
         </Route>
+
       </Routes>
     </BrowserRouter>
   );
