@@ -19,8 +19,13 @@ async def get_candidate_profile(
 ):
     result = await db.execute(
         select(CandidateProfile)
-        .join(User, CandidateProfile.user_id == User.id)
-        .where(User.email == "demo@joblens.ai")
+        .join(
+            User,
+            CandidateProfile.user_id == User.id
+        )
+        .where(
+            User.email == "demo@joblens.ai"
+        )
     )
 
     profile = result.scalar_one_or_none()
@@ -28,19 +33,48 @@ async def get_candidate_profile(
     if profile is None:
         raise HTTPException(
             status_code=404,
-            detail="No candidate profile found. Please upload a resume first.",
+            detail=(
+                "No candidate profile found. "
+                "Please upload a resume first."
+            ),
         )
 
     return {
         "profile_id": profile.id,
         "user_id": profile.user_id,
         "resume_id": profile.resume_id,
-        "skills": profile.skills,
-        "education": profile.education,
-        "experience": profile.experience,
-        "projects": profile.projects,
-        "certifications": profile.certifications,
-        "preferred_roles": profile.preferred_roles,
-        "preferred_locations": profile.preferred_locations,
-        "summary": profile.summary,
+
+        "skills": profile.skills or [],
+
+        "core_skills": (
+            profile.core_skills or []
+        ),
+
+        "supporting_skills": (
+            profile.supporting_skills or []
+        ),
+
+        "experience_level": (
+            profile.experience_level
+        ),
+
+        "projects": (
+            profile.projects or []
+        ),
+
+        "certifications": (
+            profile.certifications or []
+        ),
+
+        "preferred_roles": (
+            profile.preferred_roles or []
+        ),
+
+        "career_keywords": (
+            profile.career_keywords or []
+        ),
+
+        "updated_at": (
+            profile.updated_at
+        ),
     }
