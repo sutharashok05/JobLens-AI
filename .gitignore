@@ -17,6 +17,9 @@ frontend/.env
 frontend/.env.*
 !frontend/.env.example
 
+print_structure.py
+project-structure.txt
+
 
 # --------------------------
 # Python
@@ -145,6 +148,7 @@ backend/cache/
 htmlcov/
 coverage/
 test-results/
+
 
 
 # --------------------------
