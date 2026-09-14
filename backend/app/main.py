@@ -1,16 +1,17 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.resumes import router as resume_router
-from app.db.database import test_database_connection
 from app.api.profile import router as profile_router
 from app.api.search import router as search_router
-from fastapi.middleware.cors import CORSMiddleware
+from app.db.database import test_database_connection
 
 
 app = FastAPI(
     title="JobLens AI",
     version="1.0.0",
 )
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,6 +30,7 @@ app.include_router(resume_router)
 app.include_router(profile_router)
 app.include_router(search_router)
 
+
 @app.get("/")
 async def root():
     return {
@@ -37,7 +39,6 @@ async def root():
         "docs": "/docs",
         "health": "/health",
     }
-
 
 
 @app.get("/health")
